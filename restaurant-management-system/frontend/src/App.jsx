@@ -1,16 +1,16 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import MenuPage from "./pages/MenuPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        {/* Luego aquí agregas más rutas como /menu, /cart, etc */}
+        <Route path="/menu" element={<MenuPage />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-cd

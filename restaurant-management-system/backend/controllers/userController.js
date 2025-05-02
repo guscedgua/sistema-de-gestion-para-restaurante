@@ -3,10 +3,37 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Generar token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+// LOGIN de usuario
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // 1. Buscar usuario por email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: '❌ Usuario no encontrado' });
+    }
+
+    // 2. Verificar contraseña
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: '❌ Contraseña incorrecta' });
+    }
+
+    // 3. Devolver info básica
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: '❌ Error al iniciar sesión', error });
+  }
 };
+
 
 // Registrar usuario
 exports.registerUser = async (req, res) => {
@@ -43,3 +70,51 @@ exports.authUser = async (req, res) => {
     res.status(401).json({ message: 'Correo o contraseña inválidos' });
   }
 };
+
+
+// Buscar usuario por email
+
+exports.getUserByEmail = async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar usuario', error });
+  }
+};
+// Buscar todos los usuarios
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // excluye contraseña
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener usuarios', error });
+  }
+};
+
+// Buscar todos el rol
+
+exports.getUsersByRole = async (req, res) => {
+  const { role } = req.params;
+
+  try {
+    const users = await User.find({ role }).select('-password');
+    
+    if (!users.length) {
+      return res.status(404).json({ message: `No se encontraron usuarios con el rol ${role}` });
+    }
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar usuarios por rol', error });
+  }
+};
+

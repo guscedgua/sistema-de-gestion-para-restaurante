@@ -1,10 +1,31 @@
-// backend/routes/userRoutes.js
 const express = require('express');
-const { registerUser, authUser } = require('../controllers/userController');
+const {
+  registerUser,
+  loginUser,
+  getUserByEmail,
+  getAllUsers,
+  getUsersByRole // 👈 nuevo
+} = require('../controllers/userController');
+
+const { protect,adminOnly  } = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
-// Rutas para usuarios
 router.post('/register', registerUser);
-router.post('/login', authUser);
+router.post('/login', loginUser);
+router.get('/role/:role', protect, getUsersByRole);
+
+router.get('/', protect, adminOnly, getAllUsers);
+
+
+router.get('/profile', protect, (req, res) => {
+  res.json({
+    message: '✅ Acceso autorizado',
+    user: req.user,
+  });
+});
+
+// ✅ NUEVA RUTA para buscar usuario por email
+router.get('/find/:email', protect, getUserByEmail);
 
 module.exports = router;

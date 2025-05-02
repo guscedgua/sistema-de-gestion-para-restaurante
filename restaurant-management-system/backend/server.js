@@ -4,8 +4,11 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
+
 // Importar rutas
 const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+
 
 // Inicializar app
 dotenv.config();
@@ -17,6 +20,9 @@ app.use(express.json()); // para leer datos JSON en body de peticiones
 
 // Rutas
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+
+
 
 // Página de prueba
 app.get('/', (req, res) => {
